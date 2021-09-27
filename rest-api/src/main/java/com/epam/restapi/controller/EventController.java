@@ -5,11 +5,17 @@ import com.epam.restapi.model.Event;
 import com.epam.restapi.model.EventDto;
 import com.epam.restapi.service.EventService;
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +31,9 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.websocket.server.PathParam;
 
 /**
@@ -35,6 +44,7 @@ import javax.websocket.server.PathParam;
  */
 @RestController
 @RequestMapping("event")
+@Validated
 @AllArgsConstructor
 public class EventController {
 
@@ -42,9 +52,13 @@ public class EventController {
 
   private final ModelMapper mapper;
 
+  @Operation(summary = "Get all events")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Found all events",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EventDto.class)) }),
+      @ApiResponse(responseCode = "204", description = "Not found events")})
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
   public List<EventDto> getAllEvent() {
     List<Event> allEvents = service.getAllEvents();
     if (allEvents.isEmpty()) {
@@ -55,42 +69,74 @@ public class EventController {
         .collect(Collectors.toList());
   }
 
+  @Operation(summary = "Get a event by id")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Found a event",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EventDto.class)) }),
+      @ApiResponse(responseCode = "204", description = "Not found event")})
   @GetMapping(value = "{id}")
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public EventDto getEventById(@PathVariable("id") Integer id) {
+  public EventDto getEventById(
+      @NotBlank(message = "Id should be not null")
+      @Min(value = 1, message = "Id should be more than 0")
+      @PathVariable("id") Integer id) {
     Event event = service.getEventById(id);
     return convertToDto(event);
   }
 
+  @Operation(summary = "Get a event by title")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Found a event",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EventDto.class)) }),
+      @ApiResponse(responseCode = "204", description = "Not found event")})
   @GetMapping("by")
   @ResponseStatus(HttpStatus.OK)
-  public EventDto getEventByTitle(@PathParam("title") String title) {
+  public EventDto getEventByTitle(
+      @NotBlank(message = "Title should be not null")
+      @PathParam("title") String title) {
     Event event = service.getAllEventsByTitle(title);
     return convertToDto(event);
   }
 
+  @Operation(summary = "Create a event")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "201", description = "Event is created",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EventDto.class)) })})
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public EventDto createEvent(@RequestBody EventDto eventDto) {
+  public EventDto createEvent(@Valid @RequestBody EventDto eventDto) {
     Event event = convertToEntity(eventDto);
     Event createdEvent = service.createEvent(event);
     return convertToDto(createdEvent);
   }
 
+  @Operation(summary = "Update event")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Event is updated",
+          content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EventDto.class)) }),
+      @ApiResponse(responseCode = "204", description = "Not found event")})
   @PutMapping(value = "{id}")
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public EventDto updateEvent(@PathVariable("id") Integer id, @RequestBody EventDto eventDto) {
+  public EventDto updateEvent(
+      @NotBlank(message = "Id should be not null")
+      @Min(value = 1, message = "Id should be more than 0")
+      @PathVariable("id") Integer id,
+      @Valid @RequestBody EventDto eventDto) {
     Event event = convertToEntity(eventDto);
     Event updatedEvent = service.updateEvent(id, event);
     return convertToDto(updatedEvent);
   }
 
+  @Operation(summary = "Delete event")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Event is deleted"),
+      @ApiResponse(responseCode = "204", description = "Not found event")})
   @DeleteMapping(value = "{id}")
   @ResponseStatus(HttpStatus.OK)
-  public void deleteEvent(@PathVariable("id") Integer id) {
+  public void deleteEvent(
+      @NotBlank(message = "Id should be not null")
+      @Min(value = 1, message = "Id should be more than 0")
+      @PathVariable("id") Integer id) {
     Event event = service.getEventById(id);
     service.deleteEvent(event);
   }

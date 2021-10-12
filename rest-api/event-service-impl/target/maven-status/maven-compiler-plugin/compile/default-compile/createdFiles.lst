@@ -1,0 +1,2 @@
+exception\NotFoundEntityException.class
+service\impl\EventServiceImpl.class

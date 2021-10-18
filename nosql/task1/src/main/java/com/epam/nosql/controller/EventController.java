@@ -1,6 +1,7 @@
 package com.epam.nosql.controller;
 
 import com.epam.nosql.exception.NotFoundEntityException;
+import com.epam.nosql.mapper.EventMapper;
 import com.epam.nosql.model.Event;
 import com.epam.nosql.model.EventDto;
 import com.epam.nosql.service.EventService;
@@ -12,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,7 +47,7 @@ public class EventController {
 
   private final EventService service;
 
-  private final ModelMapper mapper;
+  private final EventMapper mapper;
 
   @Operation(summary = "Get all events")
   @ApiResponses(value = {
@@ -137,7 +137,7 @@ public class EventController {
 
   @SneakyThrows
   private Event convertToEntity(EventDto eventDto) {
-    Event event = mapper.map(eventDto, Event.class);
+    Event event = mapper.eventDtoToEvent(eventDto);
     if (!Strings.isNullOrEmpty(eventDto.getDateTime())) {
       event.setDateTime(new SimpleDateFormat("dd.MM.yyyy").parse(eventDto.getDateTime()));
     }
@@ -145,7 +145,7 @@ public class EventController {
   }
 
   private EventDto convertToDto(Event event) {
-    EventDto eventDto = mapper.map(event, EventDto.class);
+    EventDto eventDto = mapper.eventToEventDto(event);
     if (Objects.nonNull(event.getDateTime())) {
       eventDto.setDateTime(new SimpleDateFormat("dd.MM.yyyy").format(event.getDateTime()));
     }

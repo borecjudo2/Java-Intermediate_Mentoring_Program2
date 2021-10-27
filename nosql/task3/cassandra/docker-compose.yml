@@ -1,0 +1,53 @@
+version: '3.9'
+
+networks:
+  default_network:
+
+services:
+  node0:
+    image: cassandra
+    container_name: node0
+    restart: always
+    networks:
+      - default_network
+    ports:
+      - "9042:9042"
+
+  node1:
+    image: cassandra
+    container_name: node1
+    restart: always
+    networks:
+      - default_network
+    ports:
+      - "9043:9042"
+    environment:
+      - CASSANDRA_SEEDS=node0
+    depends_on:
+      - node0
+
+  node2:
+    image: cassandra
+    container_name: node2
+    restart: always
+    networks:
+      - default_network
+    ports:
+      - "9044:9042"
+    environment:
+      - CASSANDRA_SEEDS=node0
+    depends_on:
+      - node0
+
+  node3:
+    image: cassandra
+    container_name: node3
+    restart: always
+    networks:
+      - default_network
+    ports:
+      - "9045:9042"
+    environment:
+      - CASSANDRA_SEEDS=node0
+    depends_on:
+      - node0

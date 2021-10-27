@@ -21,7 +21,6 @@ public class Config {
     ClientConfiguration clientConfiguration
         = ClientConfiguration.builder()
         .connectedTo("localhost:9200")
-        .withBasicAuth("elastic", "changeme")
         .build();
 
     return RestClients.create(clientConfiguration).rest();

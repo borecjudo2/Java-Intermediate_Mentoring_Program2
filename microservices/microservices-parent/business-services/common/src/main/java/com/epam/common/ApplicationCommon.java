@@ -1,5 +1,6 @@
 package com.epam.common;
 
+import com.netflix.config.DynamicPropertyFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -26,7 +27,8 @@ public class ApplicationCommon {
 class Controller {
 
   @GetMapping
-  public String getName() {
-    return "COMMON";
+  public String getPropertyFromArchaius() {
+    return DynamicPropertyFactory.getInstance()
+        .getStringProperty("common.archaius.properties.one", "not found!").getValue();
   }
 }

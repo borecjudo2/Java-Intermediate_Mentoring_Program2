@@ -1,16 +1,11 @@
 server:
-  port: 8760
+  port: 8762
 spring:
   application:
-    name: common
+    name: two
 eureka:
   client:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
   instance:
     preferIpAddress: true
-
-common:
-  archaius:
-    properties:
-      one: one FROM:config.properties

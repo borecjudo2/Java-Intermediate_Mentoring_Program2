@@ -2,4 +2,4 @@ server:
   port: 8765
 spring:
   application:
-    name: apigateway
+    name: apigateway.Dockerfile

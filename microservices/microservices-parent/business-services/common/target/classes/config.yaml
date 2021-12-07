@@ -1,0 +1,5 @@
+one: some_prop10
+
+common:
+  archaius:
+    properties: some_prop11
